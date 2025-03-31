@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PCB成本评估</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        .form-container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        .form-row {
+            display: flex;
+            margin-bottom: 15px;
+            justify-content: space-between;
+        }
+        .form-group {
+            display: flex;
+            align-items: center;
+            width: 48%;
+        }
+        label {
+            width: 120px;
+            text-align: right;
+            margin-right: 15px;
+        }
+        input, select {
+            padding: 8px;
+            width: 180px;
+        }
+        .radio-group, .checkbox-group {
+            display: flex;
+            align-items: center;
+        }
+        .radio-group label, .checkbox-group label {
+            width: auto;
+            text-align: left;
+            margin-right: 15px;
+            margin-left: 5px;
+        }
+        .manufacturer-combo {
+            position: relative;
+            width: 200px;
+        }
+        .manufacturer-combo select {
+            width: 100%;
+        }
+        .manufacturer-combo input {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: calc(100% - 16px);
+            display: none;
+        }
+        .size-group {
+            display: flex;
+            align-items: center;
+        }
+        .size-input {
+            width: 80px;
+        }
+        .button-group {
+            margin-top: 30px;
+            text-align: center;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 0 10px;
+            cursor: pointer;
+        }
+        .cost-input {
+            width: 150px;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <h1>PCB成本评估</h1>
+
+        <form id="pcbForm">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="board-name">板卡名称:</label>
+                    <input type="text" id="board-name" name="board_name" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="pcbManufacturer">PCB厂家:</label>
+                    <div class="manufacturer-combo">
+                        <select id="pcbManufacturer" name="pcbManufacturer" onchange="handleManufacturerSelect(this)">
+                            <option value="">-- 选择或输入 --</option>
+                            <option value="深南电路">深南电路</option>
+                            <option value="兴森快捷">兴森快捷</option>
+                            <option value="景旺电子">景旺电子</option>
+                            <option value="沪电股份">沪电股份</option>
+                            <option value="生益电子">生益电子</option>
+                            <option value="其他">其他</option>
+                        </select>
+                        <input type="text" id="pcbManufacturerInput" name="pcbManufacturerInput"
+                               placeholder="输入厂家名称" onblur="handleManufacturerInput(this)">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>是否需要三防涂覆:</label>
+                    <div class="radio-group">
+                        <label><input type="radio" name="conformal_coating" value="是"> 是</label>
+                        <label><input type="radio" name="conformal_coating" value="否" checked> 否</label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="coatingManufacturer">三防厂家:</label>
+                    <div class="manufacturer-combo">
+                        <select id="coatingManufacturer" name="coatingManufacturer" onchange="handleManufacturerSelect(this)">
+                            <option value="">-- 选择或输入 --</option>
+                            <option value="北京同力恒业">北京同力恒业</option>
+                            <option value="3M">3M</option>
+                            <option value="道康宁">道康宁</option>
+                            <option value="其他">其他</option>
+                        </select>
+                        <input type="text" id="coatingManufacturerInput" name="coatingManufacturerInput"
+                               placeholder="输入厂家名称" onblur="handleManufacturerInput(this)">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="pcb-layers">PCB层数:</label>
+                    <select id="pcb-layers" name="pcb_layers">
+                        <option value="2">2层</option>
+                        <option value="4">4层</option>
+                        <option value="6">6层</option>
+                        <option value="8">8层</option>
+                        <option value="10">8层</option>
+                        <option value="12">8层</option>
+                        <option value="14">8层</option>
+                        <option value="16">8层</option>
+                        <option value="18">8层</option>
+                        <option value="20">8层</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="pcb-total-cost">PCB总费用(元):</label>
+                    <input type="number" id="pcb-total-cost" name="pcb_total_cost" class="cost-input" readonly>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="pcb-length">PCB尺寸(cm):</label>
+                    <div class="size-group">
+                        <input type="number" id="pcb-length" name="pcb_length" step="0.01" class="size-input" required placeholder="长">
+                        <span style="margin: 0 5px;">×</span>
+                        <input type="number" id="pcb-width" name="pcb_width" step="0.01" class="size-input" required placeholder="宽">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="pcb-engineering-fee">PCB工程费(元):</label>
+                    <input type="number" id="pcb-engineering-fee" name="pcb_engineering_fee" class="cost-input" readonly>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="pcb-quantity">PCB数量(张):</label>
+                    <input type="number" id="pcb-quantity" name="pcb_quantity" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="pcb-unit-price">单张PCB均价(元):</label>
+                    <input type="number" id="pcb-unit-price" name="pcb_unit_price" class="cost-input" readonly>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="pcb-surface-process">PCB表面工艺:</label>
+                    <select id="pcb-surface-process" name="pcb_surface_process">
+                        <option value="喷锡">喷锡</option>
+                        <option value="沉金">沉金</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="conformal-coating-total-cost">三防总费用(元):</label>
+                    <input type="number" id="conformal-coating-total-cost" name="conformal_coating_total_cost" class="cost-input" readonly>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="pcb-inspection-standard">PCB检验标准:</label>
+                    <select id="pcb-inspection-standard" name="pcb_inspection_standard">
+                        <option value="IPC3级">IPC3级</option>
+                        <option value="军工">军工</option>
+                        <option value="IPC2级">IPC2级</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="conformal-coating-unit-price">单张三防均价(元):</label>
+                    <input type="number" id="conformal-coating-unit-price" name="conformal_coating_unit_price" class="cost-input" readonly>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>特殊工艺:</label>
+                    <div class="checkbox-group">
+                        <label><input type="checkbox" name="special_processes" value="盘中孔"> 盘中孔</label>
+                        <label><input type="checkbox" name="special_processes" value="金手指"> 金手指</label>
+                        <label><input type="checkbox" name="special_processes" value="树脂塞孔"> 树脂塞孔</label>
+                        <label><input type="checkbox" name="special_processes" value="背钻"> 背钻</label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <!-- 空白占位，保持对齐 -->
+                </div>
+            </div>
+        </form>
+
+        <div class="button-group">
+            <button type="button" id="back-button">返回</button>
+            <button type="button" id="save-button">保存</button>
+            <button type="button" id="finish-button">完成</button>
+        </div>
+    </div>
+
+    <script>
+        // 厂家选择处理函数
+        function handleManufacturerSelect(select) {
+            const combo = select.parentElement;
+            const input = combo.querySelector('input');
+
+            if (select.value === "其他") {
+                select.style.display = 'none';
+                input.style.display = 'block';
+                input.value = '';
+                input.focus();
+            } else {
+                input.style.display = 'none';
+                input.value = select.value;
+            }
+        }
+
+        function handleManufacturerInput(input) {
+            const combo = input.parentElement;
+            const select = combo.querySelector('select');
+
+            if (input.value) {
+                // 检查是否已有这个选项
+                let optionExists = false;
+                for (let i = 0; i < select.options.length; i++) {
+                    if (select.options[i].value === input.value) {
+                        optionExists = true;
+                        break;
+                    }
+                }
+
+                if (!optionExists && input.value !== "其他") {
+                    // 添加新选项
+                    const newOption = new Option(input.value, input.value);
+                    select.add(newOption, select.options.length - 1);
+                }
+
+                select.value = input.value;
+            }
+
+            input.style.display = 'none';
+            select.style.display = 'block';
+        }
+
+        // 页面加载时检查是否有已保存的数据
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const boardId = urlParams.get('boardId');
+
+            // 初始化厂家选择框
+            initManufacturerCombo('pcbManufacturer');
+            initManufacturerCombo('coatingManufacturer');
+
+            if (boardId) {
+                // 检查是否是已有板卡
+                fetch(`/costApp/get_pcb_data/?boardId=${boardId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success && !data.is_new) {
+                            // 填充已有数据
+                            populateForm(data);
+                        } else {
+                            // 新板卡，设置默认值
+                            setDefaultValues();
+                        }
+                    })
+                    .catch(error => {
+                        console.error('加载数据出错:', error);
+                        setDefaultValues();
+                    });
+            } else {
+                setDefaultValues();
+            }
+        });
+
+        function initManufacturerCombo(id) {
+            const select = document.getElementById(id);
+            const input = document.getElementById(id + 'Input');
+
+            select.addEventListener('focus', function() {
+                input.style.display = 'none';
+                select.style.display = 'block';
+            });
+        }
+
+        // 填充表单数据
+        function populateForm(data) {
+            document.getElementById('board-name').value = data.board_name || '';
+            setManufacturerValue('pcbManufacturer', data.pcbManufacturer || '');
+            setManufacturerValue('coatingManufacturer', data.coatingManufacturer || '');
+
+            // 设置单选按钮
+            const coatingValue = data.conformal_coating || '否';
+            document.querySelector(`input[name="conformal_coating"][value="${coatingValue}"]`).checked = true;
+
+            // 设置其他字段
+            document.getElementById('pcb-layers').value = data.pcb_layers || '2';
+            document.getElementById('pcb-length').value = data.pcb_length || '';
+            document.getElementById('pcb-width').value = data.pcb_width || '';
+            document.getElementById('pcb-quantity').value = data.pcb_quantity || '';
+            document.getElementById('pcb-surface-process').value = data.pcb_surface_process || '喷锡';
+            document.getElementById('pcb-inspection-standard').value = data.pcb_inspection_standard || 'IPC3级';
+
+            // 设置特殊工艺复选框
+            if (data.special_processes) {
+                const processes = data.special_processes.split(',');
+                document.querySelectorAll('input[name="special_processes"]').forEach(checkbox => {
+                    checkbox.checked = processes.includes(checkbox.value);
+                });
+            }
+
+            // 设置计算结果
+            document.getElementById('pcb-unit-price').value = data.pcb_unit_price || '0';
+            document.getElementById('pcb-engineering-fee').value = data.pcb_engineering_fee || '0';
+            document.getElementById('pcb-total-cost').value = data.pcb_total_cost || '0';
+            document.getElementById('conformal-coating-unit-price').value = data.conformal_coating_unit_price || '0';
+            document.getElementById('conformal-coating-total-cost').value = data.conformal_coating_total_cost || '0';
+        }
+
+        function setManufacturerValue(id, value) {
+            const select = document.getElementById(id);
+            const input = document.getElementById(id + 'Input');
+
+            if (value) {
+                // 检查是否已有这个选项
+                let optionExists = false;
+                for (let i = 0; i < select.options.length; i++) {
+                    if (select.options[i].value === value) {
+                        optionExists = true;
+                        break;
+                    }
+                }
+
+                if (!optionExists && value !== "其他") {
+                    // 添加新选项
+                    const newOption = new Option(value, value);
+                    select.add(newOption, select.options.length - 1);
+                }
+
+                select.value = value;
+                input.value = value;
+            }
+        }
+
+        // 设置默认值
+        function setDefaultValues() {
+            document.getElementById('pcb-layers').value = '2';
+            document.querySelector('input[name="conformal_coating"][value="否"]').checked = true;
+            document.getElementById('pcb-surface-process').value = '喷锡';
+            document.getElementById('pcb-inspection-standard').value = 'IPC3级';
+            // 其他字段保持为空
+        }
+
+        // 返回按钮 - 直接关闭窗口
+        document.getElementById('back-button').addEventListener('click', function() {
+            window.close();
+        });
+
+        // 保存按钮 - 只保存不关闭
+        document.getElementById('save-button').addEventListener('click', function() {
+            submitForm(false);
+        });
+
+        // 完成按钮 - 保存并关闭
+        document.getElementById('finish-button').addEventListener('click', function() {
+            submitForm(true);
+        });
+
+        // 提交表单的通用函数
+        function submitForm(shouldClose) {
+            const formData = new FormData(document.getElementById('pcbForm'));
+            const specialProcesses = [];
+            document.querySelectorAll('input[name="special_processes"]:checked').forEach(cb => {
+                specialProcesses.push(cb.value);
+            });
+            formData.append('special_processes_str', specialProcesses.join(','));
+
+            // 添加boardId
+            const urlParams = new URLSearchParams(window.location.search);
+            const boardId = urlParams.get('boardId');
+            if (boardId) {
+                formData.append('boardId', boardId);
+            }
+
+            fetch('/costApp/save_pcb/', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // 更新计算结果字段
+                    updateCalculatedFields(data);
+
+                    if (shouldClose) {
+                        // 准备返回父窗口的数据
+                        const returnData = {
+                            boardId: boardId,
+                            boardName: data.board_name,
+                            boardSize: `${data.pcb_length}x${data.pcb_width}`,
+                            conformalCoating: data.conformal_coating
+                        };
+
+                        // 如果是从父窗口打开的，则传递数据回去
+                        if (window.opener) {
+                            window.opener.updateBoardInfo(returnData);
+                        }
+                        window.close();
+                    } else {
+                        alert('保存成功');
+                    }
+                } else {
+                    alert('保存失败: ' + (data.error || '未知错误'));
+                }
+            })
+            .catch(error => {
+                console.error('保存出错:', error);
+                alert('保存出错: ' + error.message);
+            });
+        }
+
+        // 更新计算结果字段
+        function updateCalculatedFields(data) {
+            document.getElementById('pcb-unit-price').value = data.pcb_unit_price || '0';
+            document.getElementById('pcb-engineering-fee').value = data.pcb_engineering_fee || '0';
+            document.getElementById('pcb-total-cost').value = data.pcb_total_cost || '0';
+            document.getElementById('conformal-coating-unit-price').value = data.conformal_coating_unit_price || '0';
+            document.getElementById('conformal-coating-total-cost').value = data.conformal_coating_total_cost || '0';
+        }
+    </script>
+</body>
+</html>

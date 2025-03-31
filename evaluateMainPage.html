@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>成本预估模块页面</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+        }
+
+        header .logo {
+            height: 30px;
+        }
+
+        main {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+       .left-modules {
+            display: flex;
+            flex-wrap: wrap;
+            width: 60%;
+        }
+
+       .right-module {
+            width: 40%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+       .module {
+            width: calc(50% - 20px);
+            height: 150px;
+            margin: 10px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 1.2em;
+            text-decoration: none;
+        }
+
+       .module:nth-child(1) {
+            background-color: #3498db;
+        }
+
+       .module:nth-child(2) {
+            background-color: #2ecc71;
+        }
+
+       .module:nth-child(3) {
+            background-color: #e74c3c;
+        }
+
+       .module:nth-child(4) {
+            background-color: #f39c12;
+        }
+
+       .module:nth-child(5) {
+            background-color: #9b59b6;
+        }
+
+       .module:nth-child(6) {
+            background-color: #1abc9c;
+        }
+
+       .module:nth-child(7) {
+            width: calc(100% - 20px);
+            height: 470px;
+            background-color: #34495e;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <img src="/static/images/tasson-min.jpg" alt="TASSON logo" width="240" height="80">
+    </header>
+    <main>
+        <div class="left-modules">
+            <a href="/costApp/metaMaterialCostEvaluate" class="module">原材料成本预估模块</a>
+            <a href="/costApp/pcbMaterialCostEvaluate" class="module">环境试验成本预估模块</a>
+            <a href="#" class="module">报审价查询模块（待发布）</a>
+            <a href="#" class="module">人力成本预估模块（待发布）</a>
+            <a href="#" class="module">XXX（待发布）</a>
+            <a href="#" class="module">三化平台产品</a>
+        </div>
+        <div class="right-module">
+            <a href="/costApp/projectInfo" class="module">一键评估模块</a>
+        </div>
+    </main>
+</body>
+
+</html>    

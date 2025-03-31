@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>项目信息填报</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Segoe UI", Roboto, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background-color: #f4f6f9;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 30px;
+            background-color: #f4f6f9;
+        }
+
+        header .logo {
+            height: 50px;
+        }
+
+        h1 {
+            text-align: center;
+            flex-grow: 1;
+            margin: 0;
+            font-size: 24px;
+        }
+
+        main {
+            flex: 1;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .form-container {
+            width: 100%;
+            max-width: 1000px;
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .form-row {
+            display: flex;
+            margin-bottom: 20px;
+            align-items: center;
+        }
+
+        .form-row label {
+            width: 120px;
+            text-align: right;
+            margin-right: 15px;
+            font-weight: normal;
+            flex-shrink: 0;
+        }
+
+        .form-row input,
+        .form-row textarea {
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            flex: 1;
+            max-width: 800px;
+        }
+
+        .form-row textarea {
+            height: 100px;
+            resize: vertical;
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 10px 25px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+
+        .btn-back {
+            background-color: #f44336;
+            color: white;
+        }
+
+        .btn-next {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+        }
+
+        .empty-space {
+            width: 50px;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <img src="/static/images/tasson-min.jpg" alt="TASSON logo" width="240" height="80">
+        <h1>项目信息填报</h1>
+        <div class="empty-space"></div>
+    </header>
+
+    <main>
+        <div class="form-container">
+            <form id="projectForm" action="/costApp/save_project_info/" method="post">
+                {% csrf_token %}
+                <div class="form-row">
+                    <label for="project-number">项目编号：</label>
+                    <input type="text" id="project-number" name="projectCode"
+                           placeholder="请输入项目编号" value="{{ inst.0.projectCode }}" required>
+                </div>
+
+                <div class="form-row">
+                    <label for="business-opportunity-number">商机编号：</label>
+                    <input type="text" id="business-opportunity-number" name="opportunityNumber"
+                           placeholder="请输入商机编号" value="{{ inst.0.opportunityNumber }}" required>
+                </div>
+
+                <div class="form-row">
+                    <label for="customer-info">客户信息：</label>
+                    <input type="text" id="customer-info" name="clientInfo"
+                           placeholder="请输入客户信息" value="{{ inst.0.clientInfo }}" required>
+                </div>
+
+                <div class="form-row">
+                    <label for="product-description">产品简述：</label>
+                    <textarea id="product-description" name="productInfo"
+                              placeholder="产品应用环境/项目背景/功能描述" required>{{ inst.0.productInfo }}</textarea>
+                </div>
+
+                <div class="button-group">
+                    <button type="button" class="btn btn-back" onclick="window.location.href='/costApp/evaluateMainPage'">返回上一级</button>
+                    <button type="submit" class="btn btn-next">下一步</button>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <script>
+        // 表单提交处理
+        document.getElementById('projectForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const formData = new FormData(this);
+
+            fetch(this.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.href = '/costApp/metaInstrumentsCostEvaluate/' + data.project_id + '/';
+                } else {
+                    alert('保存失败: ' + (data.error || '未知错误'));
+                }
+            })
+            .catch(error => {
+                console.error('保存出错:', error);
+                alert('保存出错: ' + error.message);
+            });
+        });
+    </script>
+</body>
+</html>
